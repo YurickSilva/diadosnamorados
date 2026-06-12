@@ -1,0 +1,208 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Inter:wght@400;500&display=swap');
+
+  #love-card {
+    min-height: 520px;
+    background: linear-gradient(160deg, #fff0f4 0%, #fff8f0 100%);
+    border-radius: var(--border-radius-lg);
+    border: 0.5px solid #f5c0d0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .petal {
+    position: absolute;
+    width: 14px;
+    height: 18px;
+    background: #f8a0b8;
+    border-radius: 50% 10% 50% 10%;
+    opacity: 0;
+    animation: fall linear infinite;
+    top: -30px;
+  }
+
+  @keyframes fall {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 0.8; }
+    100% { transform: translateY(560px) rotate(360deg); opacity: 0; }
+  }
+
+  .hearts-float {
+    position: absolute;
+    font-size: 18px;
+    opacity: 0;
+    animation: floatUp 3s ease-in infinite;
+  }
+
+  @keyframes floatUp {
+    0%   { transform: translateY(0) scale(0.5); opacity: 0; }
+    20%  { opacity: 0.8; }
+    100% { transform: translateY(-120px) scale(1.2); opacity: 0; }
+  }
+
+  .big-heart {
+    font-size: 64px;
+    animation: pulse 1.4s ease-in-out infinite;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50%       { transform: scale(1.12); }
+  }
+
+  .title {
+    font-family: 'Dancing Script', cursive;
+    font-size: 32px;
+    color: #c0395e;
+    margin: 0.5rem 0 1rem;
+    line-height: 1.2;
+  }
+
+  .message {
+    font-family: 'Dancing Script', cursive;
+    font-size: 18px;
+    color: #7a2040;
+    max-width: 400px;
+    line-height: 1.8;
+    min-height: 120px;
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1.1em;
+    background: #c0395e;
+    vertical-align: middle;
+    animation: blink 0.8s step-end infinite;
+    margin-left: 2px;
+  }
+
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn-love {
+    background: #e84076;
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.15s, background 0.15s;
+  }
+  .btn-love:hover { background: #c0395e; transform: scale(1.05); }
+
+  .btn-outline {
+    background: transparent;
+    color: #c0395e;
+    border: 1.5px solid #e84076;
+    border-radius: 999px;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .btn-outline:hover { transform: scale(1.05); background: #fff0f4; }
+
+  .tag {
+    background: #ffd6e4;
+    color: #a02850;
+    font-size: 12px;
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+    display: inline-block;
+  }
+</style>
+
+<div id="love-card" aria-label="Carta de amor interativa para o Dia dos Namorados">
+
+  <div id="petals-container"></div>
+
+  <span class="tag">✦ Dia dos Namorados ✦</span>
+
+  <div class="big-heart">🌹</div>
+
+  <div class="title" id="card-title">Para o amor da minha vida</div>
+
+  <div class="message" id="typed-msg"><span class="cursor"></span></div>
+
+  <div class="btn-row">
+    <button class="btn-love" onclick="restartAnimation()">♡ Ler novamente</button>
+    <button class="btn-outline" onclick="sendPrompt('Me ajuda a personalizar essa carta de amor com o nome da minha namorada e uma mensagem especial')">Personalizar ↗</button>
+  </div>
+
+</div>
+
+<script>
+const mensagem = "Cada dia ao seu lado é um presente que eu nunca cansei de abrir. Você é minha casa, minha calma e minha alegria maior. Feliz Dia dos Namorados, meu amor. 💕";
+
+let i = 0;
+let typingTimer = null;
+
+function typeMessage() {
+  const el = document.getElementById('typed-msg');
+  if (i <= mensagem.length) {
+    el.innerHTML = mensagem.slice(0, i) + '<span class="cursor"></span>';
+    i++;
+    typingTimer = setTimeout(typeMessage, 38);
+  }
+}
+
+function restartAnimation() {
+  clearTimeout(typingTimer);
+  i = 0;
+  document.getElementById('typed-msg').innerHTML = '<span class="cursor"></span>';
+  setTimeout(typeMessage, 400);
+}
+
+function createPetals() {
+  const container = document.getElementById('petals-container');
+  container.innerHTML = '';
+  const colors = ['#f8a0b8','#f4bfcc','#fcd1e0','#f083a0','#fde8ef'];
+  for (let p = 0; p < 18; p++) {
+    const petal = document.createElement('div');
+    petal.className = 'petal';
+    petal.style.left = Math.random() * 100 + '%';
+    petal.style.animationDuration = (4 + Math.random() * 5) + 's';
+    petal.style.animationDelay = (Math.random() * 6) + 's';
+    petal.style.background = colors[Math.floor(Math.random() * colors.length)];
+    petal.style.transform = `rotate(${Math.random()*60-30}deg)`;
+    container.appendChild(petal);
+  }
+}
+
+function spawnHeart() {
+  const card = document.getElementById('love-card');
+  const h = document.createElement('div');
+  h.className = 'hearts-float';
+  h.textContent = ['💖','💕','💗','🌸','💝'][Math.floor(Math.random()*5)];
+  h.style.left = (20 + Math.random() * 60) + '%';
+  h.style.bottom = '60px';
+  h.style.animationDelay = '0s';
+  card.appendChild(h);
+  setTimeout(() => h.remove(), 3000);
+}
+
+createPetals();
+setTimeout(typeMessage, 600);
+setInterval(spawnHeart, 2200);
+</script>
