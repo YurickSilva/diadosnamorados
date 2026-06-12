@@ -3,7 +3,7 @@
   @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Inter:wght@400;500&display=swap');
 
   #love-card {
-    min-height: 520px;
+    min-height: 540px;
     background: linear-gradient(160deg, #fff0f4 0%, #fff8f0 100%);
     border-radius: var(--border-radius-lg);
     border: 0.5px solid #f5c0d0;
@@ -13,7 +13,7 @@
     justify-content: center;
     position: relative;
     overflow: hidden;
-    padding: 2rem;
+    padding: 2rem 2.5rem;
     text-align: center;
   }
 
@@ -26,11 +26,12 @@
     opacity: 0;
     animation: fall linear infinite;
     top: -30px;
+    pointer-events: none;
   }
 
   @keyframes fall {
     0%   { transform: translateY(0) rotate(0deg); opacity: 0.8; }
-    100% { transform: translateY(560px) rotate(360deg); opacity: 0; }
+    100% { transform: translateY(580px) rotate(360deg); opacity: 0; }
   }
 
   .hearts-float {
@@ -38,47 +39,49 @@
     font-size: 18px;
     opacity: 0;
     animation: floatUp 3s ease-in infinite;
+    pointer-events: none;
   }
 
   @keyframes floatUp {
     0%   { transform: translateY(0) scale(0.5); opacity: 0; }
-    20%  { opacity: 0.8; }
-    100% { transform: translateY(-120px) scale(1.2); opacity: 0; }
+    20%  { opacity: 0.9; }
+    100% { transform: translateY(-130px) scale(1.2); opacity: 0; }
   }
 
-  .big-heart {
-    font-size: 64px;
+  .big-emoji {
+    font-size: 60px;
     animation: pulse 1.4s ease-in-out infinite;
     line-height: 1;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.4rem;
+    transition: opacity 0.3s;
   }
 
   @keyframes pulse {
     0%, 100% { transform: scale(1); }
-    50%       { transform: scale(1.12); }
+    50%       { transform: scale(1.1); }
   }
 
   .title {
     font-family: 'Dancing Script', cursive;
-    font-size: 32px;
+    font-size: 34px;
     color: #c0395e;
-    margin: 0.5rem 0 1rem;
+    margin: 0.4rem 0 0.8rem;
     line-height: 1.2;
   }
 
   .message {
     font-family: 'Dancing Script', cursive;
-    font-size: 18px;
+    font-size: 19px;
     color: #7a2040;
-    max-width: 400px;
-    line-height: 1.8;
-    min-height: 120px;
+    max-width: 420px;
+    line-height: 1.85;
+    min-height: 130px;
   }
 
   .cursor {
     display: inline-block;
     width: 2px;
-    height: 1.1em;
+    height: 1em;
     background: #c0395e;
     vertical-align: middle;
     animation: blink 0.8s step-end infinite;
@@ -87,10 +90,18 @@
 
   @keyframes blink { 50% { opacity: 0; } }
 
+  .msg-counter {
+    font-size: 12px;
+    color: #d48090;
+    margin-top: 0.5rem;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.04em;
+  }
+
   .btn-row {
     display: flex;
     gap: 12px;
-    margin-top: 1.5rem;
+    margin-top: 1.2rem;
     flex-wrap: wrap;
     justify-content: center;
   }
@@ -100,92 +111,230 @@
     color: #fff;
     border: none;
     border-radius: 999px;
-    padding: 10px 24px;
+    padding: 10px 26px;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
     transition: transform 0.15s, background 0.15s;
+    font-family: 'Inter', sans-serif;
   }
   .btn-love:hover { background: #c0395e; transform: scale(1.05); }
-
-  .btn-outline {
-    background: transparent;
-    color: #c0395e;
-    border: 1.5px solid #e84076;
-    border-radius: 999px;
-    padding: 10px 24px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: transform 0.15s;
-  }
-  .btn-outline:hover { transform: scale(1.05); background: #fff0f4; }
+  .btn-love:disabled { opacity: 0.5; cursor: default; transform: none; }
 
   .tag {
     background: #ffd6e4;
     color: #a02850;
     font-size: 12px;
     border-radius: 999px;
-    padding: 4px 14px;
+    padding: 4px 16px;
     font-weight: 500;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.6rem;
     display: inline-block;
+    font-family: 'Inter', sans-serif;
   }
 </style>
 
-<div id="love-card" aria-label="Carta de amor interativa para o Dia dos Namorados">
-
+<div id="love-card">
   <div id="petals-container"></div>
 
   <span class="tag">✦ Dia dos Namorados ✦</span>
 
-  <div class="big-heart">🌹</div>
+  <div class="big-emoji" id="card-emoji">🌹</div>
 
-  <div class="title" id="card-title">Para o amor da minha vida</div>
+  <div class="title">Para o amor da minha vida</div>
 
   <div class="message" id="typed-msg"><span class="cursor"></span></div>
 
-  <div class="btn-row">
-    <button class="btn-love" onclick="restartAnimation()">♡ Ler novamente</button>
-    <button class="btn-outline" onclick="sendPrompt('Me ajuda a personalizar essa carta de amor com o nome da minha namorada e uma mensagem especial')">Personalizar ↗</button>
-  </div>
+  <div class="msg-counter" id="msg-counter"></div>
 
+  <div class="btn-row">
+    <button class="btn-love" id="btn-next" onclick="nextMessage()">♡ Proxima mensagem</button>
+  </div>
 </div>
 
 <script>
-const mensagem = "Cada dia ao seu lado é um presente que eu nunca cansei de abrir. Você é minha casa, minha calma e minha alegria maior. Feliz Dia dos Namorados, meu amor. 💕";
-
-let i = 0;
-let typingTimer = null;
-
-function typeMessage() {
-  const el = document.getElementById('typed-msg');
-  if (i <= mensagem.length) {
-    el.innerHTML = mensagem.slice(0, i) + '<span class="cursor"></span>';
-    i++;
-    typingTimer = setTimeout(typeMessage, 38);
+const mensagens = [
+  {
+    emoji: "🌹",
+    texto: "Cada dia ao seu lado é um presente que eu nunca cansei de abrir. Você é minha casa, minha calma e minha alegria maior. Feliz Dia dos Namorados, meu amor."
+  },
+  {
+    emoji: "🌹",
+    texto: "Tem dias que só de te ver chegar em casa já fica tudo melhor. Você é meu lugar favorito no mundo."
+  },
+  {
+    emoji: "🌹",
+    texto: "Você é poesia em forma de pessoa. Cada momento ao seu lado é algo que eu guardo com cuidado no coração. Obrigado por ser exatamente quem você é, meu amor."
+  },
+  {
+    emoji: "🌹",
+    texto: "Não preciso de grandes palavras pra saber o que sinto: você é minha pessoa. A que eu quero do lado nos dias bons, nos difíceis e em todos os outros. Te amo muito."
+  },
+  {
+    emoji: "🌹",
+    texto: "Adormecer sabendo que você está perto é um dos meus momentos favoritos do dia. Você faz essa vida ser mais gostosa de viver."
+  },
+  {
+    emoji: "🌹",
+    texto: "Eu não sabia direito o que era felicidade até te encontrar. Agora sei. É exatamente isso — você, meu amor."
+  },
+  {
+    emoji: "🌹",
+    texto: "Do jeito que você ri ao jeito que você cuida, me apaixono de novo toda vez. Feliz Dia dos Namorados, meu amor."
+  },
+  {
+    emoji: "🌹",
+    texto: "Você tem um jeito de me olhar que me faz sentir que estou exatamente onde preciso estar. Não troco isso por nada no mundo."
+  },
+  {
+    emoji: "🌹",
+    texto: "Às vezes fico te observando sem você perceber e fico pensando: como tive tanta sorte? Você é incrível, meu amor."
+  },
+  {
+    emoji: "🌹",
+    texto: "O que mais gosto em nós é que a gente não precisa de nada grandioso pra ser feliz. Só a sua presença já é o suficiente."
+  },
+  {
+    emoji: "🌹",
+    texto: "Cada plano que faço, faço pensando em você. Você já é parte de tudo que imagino pro futuro."
+  },
+  {
+    emoji: "🌹",
+    texto: "Você chegou na minha vida e reorganizou tudo do melhor jeito possível. Com você tudo faz mais sentido."
+  },
+  {
+    emoji: "🌹",
+    texto: "Tenho orgulho de quem você é. Da sua força, da sua bondade, do seu coração. Sou apaixonado por você inteiro."
+  },
+  {
+    emoji: "🌹",
+    texto: "Nem nos meus melhores sonhos eu teria imaginado alguém tão certo pra mim. E aí você apareceu. Te amo demais."
+  },
+  {
+    emoji: "🌹",
+    texto: "A vida tem ficado mais bonita desde que você está nela. Obrigado por cada dia, cada abraço, cada momento nosso."
+  },
+  {
+    emoji: "🌹",
+    texto: "Você é a pessoa com quem eu quero dividir as novidades primeiro, os medos também, e tudo mais que vier. Feliz Dia dos Namorados."
+  },
+  {
+    emoji: "🌹",
+    texto: "Quando estou do seu lado, o mundo lá fora pode fazer o que quiser. Me sinto seguro, inteiro e em paz. É você que faz isso."
+  },
+  {
+    emoji: "🌹",
+    texto: "Não é só amor o que sinto por você. É admiração, cumplicidade, gratidão. Você é muito mais do que eu poderia pedir."
+  },
+  {
+    emoji: "🌹",
+    texto: "Cada pequeno hábito seu que fui descobrindo com o tempo virou uma das minhas coisas favoritas. Me apaixonei por cada detalhe seu."
+  },
+  {
+    emoji: "🌹",
+    texto: "Você transformou coisas simples em memórias que eu nunca vou querer esquecer. Obrigado por isso, meu amor."
+  },
+  {
+    emoji: "🌹",
+    texto: "Mesmo nos dias mais ordinários, com você do lado, parece que tem algo especial acontecendo. Você dá cor a tudo."
+  },
+  {
+    emoji: "🌹",
+    texto: "Se eu pudesse escolher de novo, escolhia você. Sem hesitar. Sempre você."
+  },
+  {
+    emoji: "🌹",
+    texto: "Tem uma leveza em estar com você que eu não encontro em mais lugar nenhum. Você é meu descanso favorito."
+  },
+  {
+    emoji: "🌹",
+    texto: "Gosto de como a gente foi construindo a nossa história sem pressa. Cada pedacinho dela é especial pra mim."
+  },
+  {
+    emoji: "🌹",
+    texto: "Você me faz querer ser melhor, não por obrigação, mas porque do seu lado eu acredito que consigo. Te amo por isso."
+  },
+  {
+    emoji: "🌹",
+    texto: "Quando o dia pesa demais, lembro que vou te encontrar, e já fica mais leve. Você é o melhor fim de dia que eu poderia ter."
+  },
+  {
+    emoji: "🌹",
+    texto: "A sua risada é uma das coisas mais bonitas que já ouvi. Faço questão de te fazer rir sempre que posso."
+  },
+  {
+    emoji: "🌹",
+    texto: "Com você aprendi que amor de verdade não é perfeito, é presente. E você está aqui, sempre. Isso é tudo pra mim."
+  },
+  {
+    emoji: "🌹",
+    texto: "Você virou referência de tudo que é bom na minha vida. Quando algo me alegra, quero logo te contar."
+  },
+  {
+    emoji: "🌹",
+    texto: "Não preciso de muito pra ser feliz. Preciso de você, de um café quentinho e de um dia tranquilo do nosso lado."
+  },
+  {
+    emoji: "🌹",
+    texto: "Cada vez que você cuida de mim, mesmo nos pequenos gestos, eu me lembro o quanto tenho sorte de ter você."
+  },
+  {
+    emoji: "🌹",
+    texto: "Você é a pessoa que eu escolho todos os dias. Com alegria, com certeza e com muito amor."
   }
+];
+
+let atual = -1;
+let typingTimer = null;
+let seen = [];
+
+function proximoIndex() {
+  if (seen.length === mensagens.length) seen = [];
+  let opcoes = mensagens.map((_, i) => i).filter(i => !seen.includes(i));
+  if (atual !== -1) opcoes = opcoes.filter(i => i !== atual);
+  const idx = opcoes[Math.floor(Math.random() * opcoes.length)];
+  seen.push(idx);
+  return idx;
 }
 
-function restartAnimation() {
+function nextMessage() {
   clearTimeout(typingTimer);
-  i = 0;
-  document.getElementById('typed-msg').innerHTML = '<span class="cursor"></span>';
-  setTimeout(typeMessage, 400);
+  const btn = document.getElementById('btn-next');
+  btn.disabled = true;
+
+  atual = proximoIndex();
+  const msg = mensagens[atual];
+
+  const el = document.getElementById('typed-msg');
+  el.innerHTML = '<span class="cursor"></span>';
+
+  document.getElementById('msg-counter').textContent = 'mensagem ' + seen.length + ' de ' + mensagens.length;
+
+  let i = 0;
+  const texto = msg.texto;
+  function type() {
+    if (i <= texto.length) {
+      el.innerHTML = texto.slice(0, i) + '<span class="cursor"></span>';
+      i++;
+      typingTimer = setTimeout(type, 36);
+    } else {
+      btn.disabled = false;
+    }
+  }
+  setTimeout(type, 200);
 }
 
 function createPetals() {
   const container = document.getElementById('petals-container');
-  container.innerHTML = '';
   const colors = ['#f8a0b8','#f4bfcc','#fcd1e0','#f083a0','#fde8ef'];
   for (let p = 0; p < 18; p++) {
     const petal = document.createElement('div');
     petal.className = 'petal';
     petal.style.left = Math.random() * 100 + '%';
     petal.style.animationDuration = (4 + Math.random() * 5) + 's';
-    petal.style.animationDelay = (Math.random() * 6) + 's';
+    petal.style.animationDelay = (Math.random() * 7) + 's';
     petal.style.background = colors[Math.floor(Math.random() * colors.length)];
-    petal.style.transform = `rotate(${Math.random()*60-30}deg)`;
+    petal.style.transform = 'rotate(' + (Math.random()*60-30) + 'deg)';
     container.appendChild(petal);
   }
 }
@@ -195,14 +344,13 @@ function spawnHeart() {
   const h = document.createElement('div');
   h.className = 'hearts-float';
   h.textContent = ['💖','💕','💗','🌸','💝'][Math.floor(Math.random()*5)];
-  h.style.left = (20 + Math.random() * 60) + '%';
-  h.style.bottom = '60px';
-  h.style.animationDelay = '0s';
+  h.style.left = (15 + Math.random() * 70) + '%';
+  h.style.bottom = '70px';
   card.appendChild(h);
   setTimeout(() => h.remove(), 3000);
 }
 
 createPetals();
-setTimeout(typeMessage, 600);
-setInterval(spawnHeart, 2200);
+nextMessage();
+setInterval(spawnHeart, 2400);
 </script>
